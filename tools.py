@@ -110,6 +110,12 @@ class ResourceMonitor:
 
     def plot(self):
         import matplotlib.pyplot as plt
+        
+        # newer versions of mpl show a warning on ax.set_yticklabels()
+        # other ways to fix the problem:
+        # https://stackoverflow.com/questions/63723514/userwarning-fixedformatter-should-only-be-used-together-with-fixedlocator
+        warnings.filterwarnings('ignore', message='FixedFormatter should only be used together with FixedLocator')
+        
         fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
         ax = axes[0][0]
