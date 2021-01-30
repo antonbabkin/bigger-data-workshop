@@ -6,6 +6,7 @@ import subprocess
 import inspect
 import warnings
 import shutil
+import io
 from zipfile import ZipFile
 from pathlib import Path
 from urllib.parse import urlparse, unquote
@@ -70,6 +71,9 @@ def usage_log(pid, interval=1):
         if psutil.MACOS:
             # io_counters() not available on MacOS
             return (0, 0, 0, 0)
+        elif psutil.WINDOWS:
+            x = p.io_counters()
+            return (x.read_bytes, 0, x.write_bytes, 0)
         else:
             x = p.io_counters()
             return (x.read_bytes, x.read_chars, x.write_bytes, x.write_chars)
@@ -78,12 +82,12 @@ def usage_log(pid, interval=1):
     p.cpu_percent()
     io_before = get_io()
     while True:
-        time.sleep(interval)
         io_after = get_io()
         io_rate = tuple((x1 - x0) / interval for x0, x1 in zip(io_before, io_after))
         io_before = io_after
         line = (time.time(), p.cpu_percent(), p.memory_info().rss) + io_rate
-        print(','.join(str(x) for x in line))
+        print(','.join(str(x) for x in line), flush=True)
+        time.sleep(interval)
 
 
 class ResourceMonitor:
@@ -91,17 +95,21 @@ class ResourceMonitor:
         self.pid = os.getpid() if pid is None else pid
         self.interval = interval
         self.tags = []
+        self.df = None
 
     def start(self):
         code = inspect.getsource(usage_log) + f'\nusage_log({self.pid}, {self.interval})'
         self.process = subprocess.Popen([sys.executable, '-c', code], text=True,
-                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     def stop(self):
-        self.process.send_signal(subprocess.signal.SIGINT)
+        self.process.terminate()
         import pandas as pd
-        self.process.wait(3)
-        df = pd.read_csv(self.process.stdout)
+        log_data = self.process.stdout.read()
+        if log_data.count('\n') < 2:
+            warnings.warn('ResourceMonitor: no entries in monitor log, execution time may be too short.')
+            return            
+        df = pd.read_csv(io.StringIO(log_data))
         df['elapsed'] = df['time'] - df.loc[0, 'time']
         self.df = df.set_index('elapsed')
 
@@ -109,6 +117,10 @@ class ResourceMonitor:
         self.tags.append((time.time(), label))
 
     def plot(self):
+        if self.df is None:
+            print('ResourceMonitor: no entries in monitor log, execution time may be too short.')
+            return
+        
         import matplotlib.pyplot as plt
         
         # newer versions of mpl show a warning on ax.set_yticklabels()
@@ -154,7 +166,6 @@ class ResourceMonitor:
 
     @classmethod
     def load(cls, filepath):
-        import io
         d = json.load(open(filepath))
         m = cls()
         m.tags = d['tags']
