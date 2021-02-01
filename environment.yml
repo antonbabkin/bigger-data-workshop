@@ -7,9 +7,13 @@ dependencies:
   - pip
   - requests
   - jupyterlab
+  # jedi problem: https://github.com/ipython/ipython/issues/12740
+  - jedi<0.18.0
   - pandas
   - matplotlib
   - psutil
   - fastparquet
+  - python-snappy
   - dask
   - joblib
+  - geopandas
