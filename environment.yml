@@ -17,3 +17,4 @@ dependencies:
   - dask
   - joblib
   - geopandas
+  - descartes
