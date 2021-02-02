@@ -17,7 +17,7 @@ from psutil._common import bytes2human
 
 
 
-def download_file(url, dir=None, fname=None, overwrite=False):
+def download_file(url, dir=None, fname=None, overwrite=False, verbose=True):
     """Download file from given `url` and put it into `dir`.
     Current working directory is used as default. Missing directories are created.
     File name from `url` is used as default.
@@ -39,12 +39,13 @@ def download_file(url, dir=None, fname=None, overwrite=False):
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
         with open(fpath, 'wb') as f:
-            shutil.copyfileobj(r.raw, f)
+            for chunk in r.iter_content(chunk_size=2**20):
+                f.write(chunk)
     
-    print(f'Download complete: {fname}.')
+    if verbose: print(f'Download complete: {fname}.')
     return fpath
 
-def unzip(fpath, dst=None, overwrite=False):
+def unzip(fpath, dst=None, overwrite=False, verbose=True):
     """Extract all memberfs of Zip archive `fpath` into `dst` directory (current working directory by default)."""
     dst = Path('.' if dst is None else dst)
     with ZipFile(fpath) as zf:
@@ -54,7 +55,7 @@ def unzip(fpath, dst=None, overwrite=False):
             if overwrite or not member_path.exists():
                 zf.extract(member, dst)
                 count += 1
-        print(f'Extracted {count} files from {fpath.name}.')
+        if verbose: print(f'Extracted {count} files from {fpath.name}.')
 
 
 def usage_log(pid, interval=1):
@@ -171,3 +172,67 @@ class ResourceMonitor:
         m.tags = d['tags']
         m.df = pd.read_csv(io.StringIO(d['data'])).set_index('elapsed')
         return m
+
+
+state_00_aa = {'01': 'AL',
+               '02': 'AK',
+               '04': 'AZ',
+               '05': 'AR',
+               '06': 'CA',
+               '08': 'CO',
+               '09': 'CT',
+               '10': 'DE',
+               '11': 'DC',
+               '12': 'FL',
+               '13': 'GA',
+               '15': 'HI',
+               '16': 'ID',
+               '17': 'IL',
+               '18': 'IN',
+               '19': 'IA',
+               '20': 'KS',
+               '21': 'KY',
+               '22': 'LA',
+               '23': 'ME',
+               '24': 'MD',
+               '25': 'MA',
+               '26': 'MI',
+               '27': 'MN',
+               '28': 'MS',
+               '29': 'MO',
+               '30': 'MT',
+               '31': 'NE',
+               '32': 'NV',
+               '33': 'NH',
+               '34': 'NJ',
+               '35': 'NM',
+               '36': 'NY',
+               '37': 'NC',
+               '38': 'ND',
+               '39': 'OH',
+               '40': 'OK',
+               '41': 'OR',
+               '42': 'PA',
+               '44': 'RI',
+               '45': 'SC',
+               '46': 'SD',
+               '47': 'TN',
+               '48': 'TX',
+               '49': 'UT',
+               '50': 'VT',
+               '51': 'VA',
+               '53': 'WA',
+               '54': 'WV',
+               '55': 'WI',
+               '56': 'WY',
+               '60': 'AS',
+               '64': 'FM',
+               '66': 'GU',
+               '68': 'MH',
+               '69': 'MP',
+               '70': 'PW',
+               '72': 'PR',
+               '74': 'UM',
+               '78': 'VI'}
+
+state_aa_00 = {l:c for c,l in state_00_aa.items()}
