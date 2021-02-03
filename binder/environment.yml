@@ -1,12 +1,12 @@
 name: ds-bazaar-workshop
 channels:
-  - defaults
   - conda-forge
 dependencies:
-  - python>=3.8
+  - python=3.8
+  - nodejs
   - pip
   - requests
-  - jupyterlab
+  - jupyterlab>=2.0.0,<3
   # jedi problem: https://github.com/ipython/ipython/issues/12740
   - jedi<0.18.0
   - pandas
@@ -15,6 +15,9 @@ dependencies:
   - fastparquet
   - python-snappy
   - dask
+  - dask-labextension
+  - python-graphviz
+  - bokeh>=2.0.0
   - joblib
   - geopandas
   - descartes

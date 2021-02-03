@@ -28,7 +28,11 @@ This method requires some experience or readiness to read documentation. As rewa
 
 2. Open terminal (Anaconda Prompt on Windows) and clone this repository in a folder of your choice (`git clone https://github.com/antonbabkin/ds-bazaar-workshop.git`). Alternatively, [download](https://github.com/antonbabkin/ds-bazaar-workshop/archive/main.zip) and unpack repository code as ZIP.
 
-3. In the terminal, navigate to the repository folder (`cd ds-bazaar-workshop`) and create new [conda environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) (`conda env create`). Environment specification will be read from the `environment.yml` file, all required packages will be downloaded and installed.
+3. In the terminal, navigate to the repository folder and create new [conda environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file). Environment specification will be read from the `environment.yml` file, all required packages will be downloaded and installed.
+```
+cd ds-bazaar-workshop
+conda env create -f binder/environment.yml
+```
 
 4. Activate the environment and start JupyterLab server. This will start a new Jupyter server and open Jupyter interface in browser window.
 ```
