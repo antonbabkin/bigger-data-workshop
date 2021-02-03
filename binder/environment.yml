@@ -15,6 +15,7 @@ dependencies:
   - fastparquet
   - python-snappy
   - dask
+  - scipy
   - python-graphviz
   - joblib
   - geopandas
