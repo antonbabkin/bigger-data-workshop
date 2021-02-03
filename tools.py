@@ -236,3 +236,5 @@ state_00_aa = {'01': 'AL',
                '78': 'VI'}
 
 state_aa_00 = {l:c for c,l in state_00_aa.items()}
+tracts_state_00_aa = {c:l for c,l in state_00_aa.items() if c not in ['64', '68', '70', '74']}
+tracts_state_aa_00 = {l:c for c,l in tracts_state_00_aa.items()}

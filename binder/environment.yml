@@ -15,9 +15,7 @@ dependencies:
   - fastparquet
   - python-snappy
   - dask
-  - dask-labextension
   - python-graphviz
-  - bokeh>=2.0.0
   - joblib
   - geopandas
   - descartes
