@@ -14,6 +14,7 @@ from urllib.parse import urlparse, unquote
 import requests
 import psutil
 from psutil._common import bytes2human
+import pandas as pd
 
 
 
@@ -238,3 +239,22 @@ state_00_aa = {'01': 'AL',
 state_aa_00 = {l:c for c,l in state_00_aa.items()}
 tracts_state_00_aa = {c:l for c,l in state_00_aa.items() if c not in ['64', '68', '70', '74']}
 tracts_state_aa_00 = {l:c for c,l in tracts_state_00_aa.items()}
+
+sectors = ['11', '21', '22', '23', '31', '42', '44', '48', '51', '52',
+           '53', '54', '55', '56', '61', '62', '71', '72', '81', '92', '99']
+
+def convert_synig_dtypes(df):
+    """Convert to custom dtypes in place."""
+    if 'YEAR' in df:
+        df['YEAR'] = df['YEAR'].astype('int16')
+    if 'STATE' in df:
+        df['STATE'] = pd.Categorical(df['STATE'], list(state_00_aa.values()))
+    if 'SECTOR' in df:
+        df['SECTOR'] = pd.Categorical(df['SECTOR'], sectors)
+    if 'EMPLOYEES' in df:
+        df['EMPLOYEES'] = df['EMPLOYEES'].astype('float32')
+    if 'EMPLOYEES_CODE' in df:
+        df['EMPLOYEES_CODE'] = pd.Categorical(df['EMPLOYEES_CODE'], list('ABCDEFGHIJK'), ordered=True)
+    for c in ['LONGITUDE', 'LATITUDE']:
+        if c in df:
+            df[c] = df[c].astype('float64')
